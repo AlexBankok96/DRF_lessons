@@ -1,0 +1,18 @@
+[
+    {
+        "model": "courses.Course",
+        "pk": 1,
+        "fields": {
+            "title": "Course 1",
+            "description": "Description for Course 1"
+        }
+    },
+    {
+        "model": "courses.Course",
+        "pk": 2,
+        "fields": {
+            "title": "Course 2",
+            "description": "Description for Course 2"
+        }
+    }
+]

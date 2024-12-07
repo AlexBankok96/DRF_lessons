@@ -1,0 +1,32 @@
+[
+    {
+        "model": "courses.Lesson",
+        "pk": 1,
+        "fields": {
+            "title": "Lesson 1",
+            "description": "Description for Lesson 1",
+            "video_url": "video_url_1",
+            "course": 1
+        }
+    },
+    {
+        "model": "courses.Lesson",
+        "pk": 2,
+        "fields": {
+            "title": "Lesson 2",
+            "description": "Description for Lesson 2",
+            "video_url": "video_url_2",
+            "course": 1
+        }
+    },
+    {
+        "model": "courses.Lesson",
+        "pk": 3,
+        "fields": {
+            "title": "Lesson 3",
+            "description": "Description for Lesson 3",
+            "video_url": "video_url_3",
+            "course": 2
+        }
+    }
+]
