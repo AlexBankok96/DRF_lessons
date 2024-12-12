@@ -17,6 +17,7 @@ class User(AbstractUser):
         related_name="custom_user_permissions_set",
         blank=True,
     )
+
 class Payment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     payment_date = models.DateTimeField(auto_now_add=True)
