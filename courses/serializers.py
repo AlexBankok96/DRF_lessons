@@ -1,21 +1,31 @@
 from rest_framework import serializers
-from .models import Course, Lesson
+from .models import Course, Lesson, Subscription
+from .validators import validate_video_url
+
 
 class LessonSerializer(serializers.ModelSerializer):
-   class Meta:
-       model = Lesson
-       fields = ['id', 'title', 'description', 'preview', 'video_url', 'course']
+    class Meta:
+        model = Lesson
+        fields = ['id', 'title', 'description', 'preview', 'video_url', 'course']
+
+    video_url = serializers.URLField(validators=[validate_video_url])  # Включаем валидатор
+
 
 class CourseSerializer(serializers.ModelSerializer):
     lessons_count = serializers.SerializerMethodField()
     lessons = LessonSerializer(many=True, required=False)
+    is_subscribed = serializers.SerializerMethodField()  # Признак подписки
 
     class Meta:
         model = Course
-        fields = ['id', 'title', 'description', 'preview', 'lessons_count', 'lessons']
+        fields = ['id', 'title', 'description', 'preview', 'lessons_count', 'lessons', 'is_subscribed']
 
     def get_lessons_count(self, obj):
         return obj.lessons.count()
+
+    def get_is_subscribed(self, obj):
+        user = self.context['request'].user
+        return obj.subscriptions.filter(user=user).exists()
 
     def create(self, validated_data):
         lessons_data = validated_data.pop('lessons', [])

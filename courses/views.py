@@ -1,10 +1,12 @@
-# courses/views.py
-from rest_framework import viewsets, generics
+from rest_framework import viewsets, generics, status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.filters import SearchFilter, OrderingFilter
-from .models import Course, Lesson
+from django.shortcuts import get_object_or_404
+from .models import Course, Lesson, Subscription
 from .serializers import CourseSerializer, LessonSerializer
 from users.permissions import IsModerator
+
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
@@ -19,6 +21,7 @@ class CourseViewSet(viewsets.ModelViewSet):
             self.permission_classes = [IsAuthenticated]
         return [permission() for permission in self.permission_classes]
 
+
 class LessonListCreateView(generics.ListCreateAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
@@ -32,6 +35,7 @@ class LessonListCreateView(generics.ListCreateAPIView):
             self.permission_classes = [IsAuthenticated]
         return [permission() for permission in self.permission_classes]
 
+
 class LessonRetrieveView(generics.RetrieveAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
@@ -42,3 +46,18 @@ class LessonRetrieveView(generics.RetrieveAPIView):
         else:
             self.permission_classes = [IsAuthenticated]
         return [permission() for permission in self.permission_classes]
+
+
+class SubscriptionAPIView(generics.GenericAPIView):  
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        course_id = request.data.get('course_id')
+        course = get_object_or_404(Course, id=course_id)
+        subscription, created = Subscription.objects.get_or_create(user=request.user, course=course)
+
+        if not created:
+            subscription.delete()
+            return Response({"message": "Subscription removed"}, status=status.HTTP_200_OK)
+
+        return Response({"message": "Subscription added"}, status=status.HTTP_201_CREATED)
