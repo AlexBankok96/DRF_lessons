@@ -8,13 +8,13 @@ class LessonSerializer(serializers.ModelSerializer):
         model = Lesson
         fields = ['id', 'title', 'description', 'preview', 'video_url', 'course']
 
-    video_url = serializers.URLField(validators=[validate_video_url])  # Включаем валидатор
+    video_url = serializers.URLField(validators=[validate_video_url])
 
 
 class CourseSerializer(serializers.ModelSerializer):
     lessons_count = serializers.SerializerMethodField()
     lessons = LessonSerializer(many=True, required=False)
-    is_subscribed = serializers.SerializerMethodField()  # Признак подписки
+    is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
         model = Course

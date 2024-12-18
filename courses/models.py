@@ -29,9 +29,9 @@ class Lesson(models.Model):
         return self.title
 
 
-class Subscription(models.Model):  # Новая модель для подписок
+class Subscription(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='subscriptions')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='subscriptions')
 
     class Meta:
-        unique_together = ('user', 'course')  # Гарантируем уникальность подписки
+        unique_together = ('user', 'course')
