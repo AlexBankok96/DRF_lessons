@@ -3,9 +3,9 @@ from django.contrib.auth import get_user_model
 from .models import Course, Lesson, Subscription
 from rest_framework import status
 
+
 class CourseAPITests(APITestCase):
     def setUp(self):
-
         get_user_model().objects.all().delete()
         Lesson.objects.all().delete()
         Course.objects.all().delete()
@@ -16,12 +16,14 @@ class CourseAPITests(APITestCase):
         self.lesson = Lesson.objects.create(title="Test Lesson", course=self.course, video_url="https://youtube.com")
 
     def test_course_subscription(self):
+        """Тестирование подписки на курс"""
         self.client.force_authenticate(user=self.user)
         response = self.client.post('/api/v1/courses/subscriptions/', {'course_id': self.course.id})
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['message'], "Subscription added")
 
     def test_course_unsubscription(self):
+        """Тестирование отписки от курса"""
         self.client.force_authenticate(user=self.user)
         response = self.client.post('/api/v1/courses/subscriptions/', {'course_id': self.course.id})
         self.assertEqual(response.status_code, 201)
@@ -32,13 +34,14 @@ class CourseAPITests(APITestCase):
         self.assertEqual(response.data['message'], "Subscription removed")
 
     def test_lesson_list_pagination(self):
+        """Тестирование пагинации списка уроков"""
+
         for i in range(15):
             Lesson.objects.create(
                 title=f"Lesson {i}",
                 course=self.course,
                 video_url="https://youtube.com"
             )
-
 
         print("Количество уроков в базе:", Lesson.objects.count())
 
@@ -51,7 +54,8 @@ class CourseAPITests(APITestCase):
         self.assertEqual(len(response.data['results']), 10)
         self.assertIn('next', response.data)
 
+
         next_url = response.data['next']
         response = self.client.get(next_url)
         print("Данные второй страницы:", response.data['results'])
-        self.assertEqual(len(response.data['results']), 5)
+        self.assertEqual(len(response.data['results']), 6)
