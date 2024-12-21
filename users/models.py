@@ -18,16 +18,56 @@ class User(AbstractUser):
         blank=True,
     )
 
-class Payment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    payment_date = models.DateTimeField(auto_now_add=True)
-    paid_course = models.ForeignKey(Course, null=True, blank=True, on_delete=models.CASCADE)
-    paid_lesson = models.ForeignKey(Lesson, null=True, blank=True, on_delete=models.CASCADE)
-    amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
-
-    PAYMENT_METHOD_CHOICES = [
-        ('CASH', 'Наличные'),
-        ('TRANSFER', 'Перевод на счет'),
+class Payments(models.Model):
+    payment_choices = [
+        ('Cash', "наличные"),
+        ('Transfer', "перевод"),
     ]
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Пользователь",
+        related_name='user'
+    )
+    date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата'
+    )
+    paid_course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        verbose_name='Оплаченный курс',
+        blank=True,
+        null=True,
+        related_name='payments'
+    )
+    paid_lesson = models.ForeignKey(
+        Lesson,
+        on_delete=models.CASCADE,
+        verbose_name='Оплаченный урок',
+        blank=True,
+        null=True,
+        related_name='payments'
+    )
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+    payment_type = models.CharField(
+        max_length=50,
+        choices=payment_choices,
+        verbose_name='тип оплаты'
+    )
 
-    payment_method = models.CharField(max_length=10, choices=PAYMENT_METHOD_CHOICES)
+    stripe_session_id = models.CharField(max_length=255, null=True, blank=True)
+    payment_status = models.CharField(max_length=50, default='pending')
+    payment_url = models.URLField(max_length=450, verbose_name="Ссылка на оплату", null=True, blank=True)
+    session_id = models.CharField(max_length=255, verbose_name="ID сессии", null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Платеж"
+        verbose_name_plural = "Платежи"
+        ordering = ['-date']
+
+    def __str__(self):
+        return f'Пользователь {self.user} оплатил {self.amount}'
