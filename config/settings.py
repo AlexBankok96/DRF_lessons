@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework.pagination',
     'drf_yasg',
+    'django_celery_beat',
 
 ]
 
@@ -138,3 +139,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STRIPE_API_KEY = os.getenv("STRIPE_API_KEY")
 STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
+
+CELERY_BROKER_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+CELERY_BEAT_SCHEDULE = {
+    'check-inactive-users-every-30-minutes': {
+        'task': 'courses.tasks.check_inactive_users',
+        'schedule': timedelta(minutes=30),
+    },
+}
+

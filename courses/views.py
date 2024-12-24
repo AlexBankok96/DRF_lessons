@@ -1,3 +1,6 @@
+from datetime import timedelta
+
+from django_celery_beat.utils import now
 from rest_framework import viewsets, generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -21,6 +24,11 @@ class CourseViewSet(viewsets.ModelViewSet):
         else:
             self.permission_classes = [IsAuthenticated]
         return [permission() for permission in self.permission_classes]
+
+    def perform_update(self, serializer, notify_course_update=None):
+        course = serializer.save()
+        if now() - course.updated_at > timedelta(hours=4):
+            notify_course_update.delay(course.id)
 
 
 class LessonPagination(PageNumberPagination):
